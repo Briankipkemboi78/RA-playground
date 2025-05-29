@@ -17,6 +17,11 @@ SELECT
 	footprint.scheme_owner,
 	footprint.original_scheme_owner,
 	footprint.original_volume                                                                 AS original_volume,
+	trans.royalty_applied, 
+	trans.royalty_calculated,
+	trans.royalty_fee_rate,
+	trans.royalty_MT_equivalent_volume,
+	trans.standard_premium,
 	footprint.standard_mt_volume,
 	footprint.standard_mt_equivalent_volume,
 	footprint.farmch_sale_flag,
@@ -31,6 +36,9 @@ SELECT
 	licence_year.start_date_license,
 	YEAR(licence_year.start_date_license) AS license_year
 FROM prd.fact_transactionfootprint AS footprint
+LEFT JOIN prd.fact_transaction AS trans ON
+  footprint.dim_transactiondetail_id = trans.dim_transactiondetail_id AND
+  trans.source_transaction_id = footprint.source_transaction_id
 LEFT JOIN prd.dim_subproduct AS product ON
 	footprint.dim_subproduct_id = product.dim_subproduct_id
 LEFT JOIN prd.dim_reporting_certificateholder AS cert_holder ON
@@ -47,6 +55,7 @@ LEFT JOIN prd.dim_crop AS crop ON
 	license.dim_crop_id = crop.dim_crop_id
 WHERE
 	product.crop = 'Cocoa' AND
-	license.dim_certificateholder_id = footprint.dim_footprint_certificateholder_id 
+	license.dim_certificateholder_id = footprint.dim_footprint_certificateholder_id  --AND
+	--footprint.source_transaction_id = '1000618'
 ORDER BY 
     footprint.source_transaction_id
