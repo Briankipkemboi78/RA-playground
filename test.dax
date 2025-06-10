@@ -1,0 +1,16 @@
+Certified eqv. volume, MT = 
+CALCULATE (
+    SUM ( 'prd fact_licensevolume'[equivalent_volume_license_mt] ),
+
+    -- Enforce correct relationship
+    USERELATIONSHIP (
+        'prd fact_licensevolume'[dim_license_id],
+        'prd dim_license'[dim_license_id]
+    ),
+
+    -- Filter by only licenses that are certified in the selected certification_year
+    TREATAS (
+        VALUES ( 'prd fact_transactionfootprint'[dim_reporting_certificateholder_id] ),
+        'prd fact_licensevolume'[dim_certificateholder_id]
+    )
+)
